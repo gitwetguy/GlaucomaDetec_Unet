@@ -51,7 +51,7 @@ def adjustData(img,mask,flag_multi_class,num_class):
 
 def trainGenerator(batch_size,train_path,image_folder,mask_folder,aug_dict,image_color_mode = "grayscale",
                     mask_color_mode = "grayscale",image_save_prefix  = "image",mask_save_prefix  = "mask",
-                    flag_multi_class = False,num_class = 2,save_to_dir = None,target_size = (512,512),seed = 1):
+                    flag_multi_class = False,num_class = 3,save_to_dir = None,target_size = (512,512),seed = 1):
     '''
     can generate image and mask at the same time
     use the same seed for image_datagen and mask_datagen to ensure the transformation for image and mask is the same
@@ -104,11 +104,11 @@ def testGenerator(test_path,num_image = 223, target_size = (512,512),flag_multi_
         img = trans.resize(img,target_size)
         img = np.reshape(img,img.shape+(1,)) if (not flag_multi_class) else img
         img = np.reshape(img,(1,)+img.shape)
-        # img = (img * 255).astype(np.uint8)
+        img = (img * 255).astype(np.uint8)
         yield img
 
 
-def geneTrainNpy(image_path,mask_path,flag_multi_class = False,num_class = 2,image_prefix = "image",mask_prefix = "mask",image_as_gray = True,mask_as_gray = True):
+def geneTrainNpy(image_path,mask_path,flag_multi_class = False,num_class = 3,image_prefix = "image",mask_prefix = "mask",image_as_gray = True,mask_as_gray = True):
     image_name_arr = glob.glob(os.path.join(image_path,"%s*.png"%image_prefix))
     image_arr = []
     mask_arr = []
@@ -134,7 +134,7 @@ def labelVisualize(num_class,color_dict,img):
 
 
 
-def saveResult(save_path,npyfile,flag_multi_class = False,num_class = 2):
+def saveResult(save_path,npyfile,flag_multi_class = False,num_class = 3):
     for i,item in enumerate(npyfile):
         img = labelVisualize(num_class,COLOR_DICT,item) if flag_multi_class else item[:,:,0]
-        io.imsave(os.path.join(save_path,"%d.jpg"%i),img)
+        io.imsave(os.path.join(save_path,"test%d.jpg"%i),img)
