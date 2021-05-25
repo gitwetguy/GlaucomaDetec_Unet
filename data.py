@@ -26,22 +26,29 @@ COLOR_DICT = np.array([Cup,Disc,Unlabelled])
 
 
 def adjustData(img,mask,flag_multi_class,num_class):
+    
     if(flag_multi_class):
         #print("if")
         img = img / 255
         mask = mask[:,:,:,0] if(len(mask.shape) == 4) else mask[:,:,0]
-        
+        #print(mask.shape)
         new_mask = np.zeros(mask.shape + (num_class,))
         #print("new_mask:{}".format(new_mask.shape))
-        for i in range(num_class):
-            #for one pixel in the image, find the class in mask and convert it into one-hot vector
-            #index = np.where(mask == i)
-            #index_mask = (index[0],index[1],index[2],np.zeros(len(index[0]),dtype = np.int64) + i) if (len(mask.shape) == 4) else (index[0],index[1],np.zeros(len(index[0]),dtype = np.int64) + i)
-            #new_mask[index_mask] = 1
+        #new_mask[]
+        #new_mask[mask == 0,0] = 1
+        #new_mask[mask == 0,0] = 1
+        #print(np.where(mask == 0)[0].shape)
+        for batch in range(mask.shape[0]):
+            cup_index = np.where(mask[batch,:,:]==0)
+            #print(cup_index)
+            disc_index = np.where((mask[batch,:,:]<255) & (mask[batch,:,:]>0))
+            back_index = np.where(mask[batch,:,:]==255)
+            new_mask[batch,cup_index[0],cup_index[1],0]=1
+            new_mask[batch,disc_index[0],disc_index[1],1]=1
+            new_mask[batch,back_index[0],back_index[1],2]=0
             
-            new_mask[mask == i,i] = 1
         
-        new_mask = np.reshape(new_mask,(new_mask.shape[0],new_mask.shape[1],new_mask.shape[2],new_mask.shape[3])) if flag_multi_class else np.reshape(new_mask,(new_mask.shape[0]*new_mask.shape[1],new_mask.shape[2]))
+        new_mask = np.reshape(new_mask,(new_mask.shape[0],new_mask.shape[1],new_mask.shape[2],new_mask.shape[3])) if flag_multi_class else np.reshape(new_mask,(new_mask.shape[0],new_mask.shape[1],new_mask.shape[2]))
         mask = new_mask
     elif(np.max(img) > 1):
         #print("el")
